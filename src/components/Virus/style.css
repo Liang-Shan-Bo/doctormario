@@ -1,9 +1,18 @@
-.body-blue{  
-  width:15px;  
-  height:15px;  
-  float: left;  
-  background: blue;  
-  -moz-border-radius: 10px;  
-  -webkit-border-radius: 10px;  
-  border-radius: 7px;  
-}  
+.body-blue{
+  width:15px;
+  height:15px;
+  float: left;
+  background: blue;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 7px;
+}
+.body-red{
+  width:15px;
+  height:15px;
+  float: left;
+  background: red;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 7px;
+}

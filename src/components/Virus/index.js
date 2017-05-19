@@ -3,10 +3,11 @@ import './style.css';
 
 class Virus extends Component {
   render() {
+    const {type = 'blue'} = this.props
     return (
-      <div className="body-blue">
-         <div className="eye-blue"></div>
-         <div className="mouth-blue"></div>
+      <div className={`body-${type}`}>
+         <div className={`eye-${type}`}></div>
+         <div className={`mouth-${type}`}></div>
       </div>
     );
   }
