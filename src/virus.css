@@ -1,0 +1,9 @@
+.body-blue{  
+  width:15px;  
+  height:15px;  
+  float: left;  
+  background: blue;  
+  -moz-border-radius: 10px;  
+  -webkit-border-radius: 10px;  
+  border-radius: 7px;  
+}  

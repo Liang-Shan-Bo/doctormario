@@ -1,0 +1,40 @@
+.bottle-top {
+  border-width:5px;
+  border-style: solid;
+  border-color: lightblue;
+  border-top:0;
+  border-bottom:0;
+  background-color: black;
+  width: 64px;
+  height: 48px;
+  text-align: center;
+  margin:auto;
+  position:relative;
+  top:5px;
+}
+
+.bottle {
+  border-radius:10px;
+  border-width:5px;
+  border-style: solid;
+  border-color: lightblue;
+  background-color: black;
+  width: 120px;
+  height: 240px;
+  text-align: center;
+  margin:auto;
+}
+
+.main{
+    padding-top: 10px;
+    width: 480px;
+    height: 320px;
+    background-color: black;
+    background-image: linear-gradient(45deg, purple 25%, transparent 25%, transparent 75%, purple 75%, purple), 
+        linear-gradient(45deg, purple 25%, transparent 25%, transparent 75%, purple 75%, purple);
+    background-size:30px 30px;
+    background-position: 0 0, 15px 15px;
+    text-align: center;
+    margin:0 auto;
+}
+
