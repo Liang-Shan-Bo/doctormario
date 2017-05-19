@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './virus.css';
+import './style.css';
 
 class Virus extends Component {
   render() {

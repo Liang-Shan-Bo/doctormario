@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Virus from './virus';
+import Virus from './components/Virus';
 import './App.css';
 
 class App extends Component {
