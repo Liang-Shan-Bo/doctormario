@@ -1,0 +1,34 @@
+.capsule-blue{
+  width:15px;
+  height:15px;
+  background: blue;
+  float: left;
+
+}
+.capsule-red{
+  width:15px;
+  height:15px;
+  background: red;
+  float: left;
+   border-radius: 0px 0px 7px 7px; 
+
+}
+.capsule-yellow{
+  width:15px;
+  height:15px;
+  background: yellow;
+  float: left;
+   border-radius: 0px 0px 7px 7px; 
+}
+.top{
+  border-radius: 7px 7px 0px 0px ; 
+}
+.bottom{
+  border-radius: 0px 0px 7px 7px; 
+}
+.left{
+  border-radius: 7px 0px 7px 0px; 
+}
+.right{
+  border-radius: 0px 7px 0px 7px; 
+}

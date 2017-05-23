@@ -5,7 +5,8 @@ class Bottle extends Component {
   render() {
     return (
       <div>
-        <div className="bottle-top" />
+        <div className="bottle-top" >
+        </div>
         <div className="bottle">
           {this.props.children}
         </div>
