@@ -7,6 +7,8 @@ import './App.css';
 var grids = new Array();
 let top;
 let bottom;
+let freeFall = false;
+let freeFallArray = [];
 
 class App extends Component {
 
@@ -16,6 +18,8 @@ class App extends Component {
 
   // 随机开局
   updateGrids = () => {
+    clearInterval(this.timer);
+    freeFall = false;
     grids = [];
     let blank;
     for (var i = 0; i < 16; i++) {
@@ -99,28 +103,266 @@ class App extends Component {
     }
   }
 
-  // 消除格子
+  // 清除格子
   clearGrid = (x, y) => {
     grids[x + (y * 8)] = { type: 'blank', x: x, y: y };
   }
 
-  // 下落
-  fall = () => {
-    // 如果下面的格子为空，则下降一格
-    if (grids[bottom.x + (bottom.y + 1) * 8].type == 'blank') {
-      grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
-      grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
-      this.clearGrid(top.x, top.y);
-      bottom.y++;
-      top.y++;
+  // 返回指定格子的颜色
+  getColor = (x, y) => {
+    if (y < 0 || y > 15 || x < 0 || x > 7 || grids[x + (y * 8)].type == "blank") {
+      return "black";
+    }
+    return grids[x + (y * 8)].color;
+  }
+
+  // 判断胶囊是否悬空，进行自由落体
+  checkFreeFall = (grid) => {
+    if (grid.type == 'capsule') {
+      if (grid.y < 15 && this.getColor(grid.x, grid.y + 1) == "black") {
+        let tmp = { type: 'capsule', color: grid.color, x: grid.x, y: grid.y + 1, rotate: grid.rotate };
+        grids[grid.x + (grid.y + 1) * 8] = tmp;
+        this.clearGrid(grid.x, grid.y);
+        freeFallArray.push(tmp);
+      }
+    }
+  }
+
+  // 消除
+  clearCapsule = (array) => {
+    let clearArray = [];
+    let app = this;
+    array.forEach(function (capsule) {
+      let color = grids[capsule.x + (capsule.y * 8)].color;
+      let arr = [];
+      let i = 1;
+      let j = 1;
+      // 横向消除
+      arr.push({ x: capsule.x, y: capsule.y });
+      if (app.getColor(capsule.x - 1, capsule.y) == color) {
+        i++;
+        arr.push({ x: capsule.x - 1, y: capsule.y });
+        if (app.getColor(capsule.x - 2, capsule.y) == color) {
+          i++;
+          arr.push({ x: capsule.x - 2, y: capsule.y });
+          if (app.getColor(capsule.x - 3, capsule.y) == color) {
+            i++;
+            arr.push({ x: capsule.x - 3, y: capsule.y });
+          }
+        }
+      }
+      if (app.getColor(capsule.x + 1, capsule.y) == color) {
+        i++;
+        arr.push({ x: capsule.x + 1, y: capsule.y });
+        if (app.getColor(capsule.x + 2, capsule.y) == color) {
+          i++;
+          arr.push({ x: capsule.x + 2, y: capsule.y });
+          if (app.getColor(capsule.x + 3, capsule.y) == color) {
+            i++;
+            arr.push({ x: capsule.x + 3, y: capsule.y });
+          }
+        }
+      }
+      if (i >= 4) {
+        arr.map((arr) => (clearArray.push(arr)));
+      }
+      arr = [];
+      // 纵向消除
+      arr.push({ x: capsule.x, y: capsule.y });
+      if (app.getColor(capsule.x, capsule.y - 1) == color) {
+        j++;
+        arr.push({ x: capsule.x, y: capsule.y - 1 });
+        if (app.getColor(capsule.x, capsule.y - 2) == color) {
+          j++;
+          arr.push({ x: capsule.x, y: capsule.y - 2 });
+          if (app.getColor(capsule.x, capsule.y - 3) == color) {
+            j++;
+            arr.push({ x: capsule.x, y: capsule.y - 3 });
+          }
+        }
+      }
+      if (app.getColor(capsule.x, capsule.y + 1) == color) {
+        j++;
+        arr.push({ x: capsule.x, y: capsule.y + 1 });
+        if (app.getColor(capsule.x, capsule.y + 2) == color) {
+          j++;
+          arr.push({ x: capsule.x, y: capsule.y + 2 });
+          if (app.getColor(capsule.x, capsule.y + 3) == color) {
+            j++;
+            arr.push({ x: capsule.x, y: capsule.y + 3 });
+          }
+        }
+      }
+      if (j >= 4) {
+        arr.map((arr) => (clearArray.push(arr)));
+      }
+      arr = [];
+    })
+    // 将标记格子全部消除
+    if (clearArray.length > 0) {
+      clearArray.map((arr) => (this.clearGrid(arr.x, arr.y)));
+      freeFall = true;
     } else {
+      // 生成新胶囊
       top = { x: 3, y: 0, rotate: 'top' };
       bottom = { x: 3, y: 1, rotate: 'bottom' };
       top = this.makeCapsule(top);
       bottom = this.makeCapsule(bottom);
+      freeFall = false;
     }
     this.setState({
       grids: grids
+    })
+  }
+
+  // 下落
+  fall = () => {
+    // 如果有悬浮的胶囊，则胶囊下落
+    if (freeFall) {
+      freeFallArray = [];
+      for (var index = 127; index >= 0; index--) {
+        this.checkFreeFall(grids[index]);
+      }
+      if (freeFallArray.length > 0) {
+        this.clearCapsule(freeFallArray);
+      } else {
+        freeFall = false;
+        // 生成新胶囊
+        top = { x: 3, y: 0, rotate: 'top' };
+        bottom = { x: 3, y: 1, rotate: 'bottom' };
+        top = this.makeCapsule(top);
+        bottom = this.makeCapsule(bottom);
+      }
+    } else {
+      // 如果下面的格子为空，则下降一格
+      if (bottom.y < 15 && grids[bottom.x + (bottom.y + 1) * 8].type == 'blank') {
+        grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
+        grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
+        this.clearGrid(top.x, top.y);
+        bottom.y++;
+        top.y++;
+      } else {
+        // 尝试消除
+        let arrCapsule = [top, bottom];
+        this.clearCapsule(arrCapsule);
+      }
+    }
+
+    this.setState({
+      grids: grids
+    })
+  }
+
+  // 左移
+  left = () => {
+    switch (top.rotate) {
+      case "top":
+        if (top.x > 0 && grids[top.x - 1 + (top.y * 8)].type == "blank" && grids[bottom.x - 1 + (bottom.y * 8)].type == "blank") {
+          grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(top.x, top.y);
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x - 1 + (top.y * 8)];
+          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
+        }
+        break;
+      case "bottom":
+        if (top.x > 0 && grids[top.x - 1 + (top.y * 8)].type == "blank" && grids[bottom.x - 1 + (bottom.y * 8)].type == "blank") {
+          grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(top.x, top.y);
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x - 1 + (top.y * 8)];
+          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
+        }
+        break;
+      case "left":
+        if (top.x > 0 && grids[top.x - 1 + (top.y * 8)].type == "blank") {
+          grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x - 1 + (top.y * 8)];
+          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
+        }
+        break;
+      case "right":
+        if (bottom.x > 0 && grids[bottom.x - 1 + (bottom.y * 8)].type == "blank") {
+          grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
+          grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
+          this.clearGrid(top.x, top.y);
+          top = grids[top.x - 1 + (top.y * 8)];
+          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
+        }
+        break;
+    }
+    this.setState({
+      grids: grids
+    })
+  }
+
+  // 右移
+  right = () => {
+    switch (top.rotate) {
+      case "top":
+        if (top.x < 7 && grids[top.x + 1 + (top.y * 8)].type == "blank" && grids[bottom.x + 1 + (bottom.y * 8)].type == "blank") {
+          grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(top.x, top.y);
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x + 1 + (top.y * 8)];
+          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+        }
+        break;
+      case "bottom":
+        if (top.x < 7 && grids[top.x + 1 + (top.y * 8)].type == "blank" && grids[bottom.x + 1 + (bottom.y * 8)].type == "blank") {
+          grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(top.x, top.y);
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x + 1 + (top.y * 8)];
+          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+        }
+        break;
+      case "left":
+        if (bottom.x < 7 && grids[bottom.x + 1 + (bottom.y * 8)].type == "blank") {
+          grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
+          grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x + 1 + (top.y * 8)];
+          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+        }
+        break;
+      case "right":
+        if (top.x < 7 && grids[top.x + 1 + (top.y * 8)].type == "blank") {
+          grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
+          grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(top.x, top.y);
+          top = grids[top.x + 1 + (top.y * 8)];
+          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+        }
+        break;
+    }
+    this.setState({
+      grids: grids
+    })
+  }
+
+  componentDidMount() {
+    let app = this;
+    document.addEventListener('keyup', function (e) {
+      switch (e.keyCode) {
+        case 38:
+          //上
+          console.log(38);
+          break
+        case 37:
+          //左
+          app.left();
+          break
+        case 39:
+          app.right();
+          break
+      }
     })
   }
   render() {
