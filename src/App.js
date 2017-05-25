@@ -202,13 +202,13 @@ class App extends Component {
     if (clearArray.length > 0) {
       clearArray.map((arr) => (this.clearGrid(arr.x, arr.y)));
       freeFall = true;
-    } else {
+    }
+    if (!freeFall) {
       // 生成新胶囊
       top = { x: 3, y: 0, rotate: 'top' };
       bottom = { x: 3, y: 1, rotate: 'bottom' };
       top = this.makeCapsule(top);
       bottom = this.makeCapsule(bottom);
-      freeFall = false;
     }
     this.setState({
       grids: grids
@@ -235,16 +235,61 @@ class App extends Component {
       }
     } else {
       // 如果下面的格子为空，则下降一格
-      if (bottom.y < 15 && grids[bottom.x + (bottom.y + 1) * 8].type == 'blank') {
-        grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
-        grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
-        this.clearGrid(top.x, top.y);
-        bottom.y++;
-        top.y++;
-      } else {
-        // 尝试消除
-        let arrCapsule = [top, bottom];
-        this.clearCapsule(arrCapsule);
+      switch (top.rotate) {
+        case "top":
+          if (bottom.y < 15 && grids[bottom.x + (bottom.y + 1) * 8].type == 'blank') {
+            grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
+            grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
+            this.clearGrid(top.x, top.y);
+            bottom.y++;
+            top.y++;
+          } else {
+            // 尝试消除
+            let arrCapsule = [top, bottom];
+            this.clearCapsule(arrCapsule);
+          }
+          break;
+        case "bottom":
+          if (top.y < 15 && grids[top.x + (top.y + 1) * 8].type == 'blank') {
+            grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
+            grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
+            this.clearGrid(bottom.x, bottom.y);
+            bottom.y++;
+            top.y++;
+          } else {
+            // 尝试消除
+            let arrCapsule = [top, bottom];
+            this.clearCapsule(arrCapsule);
+          }
+          break;
+        case "left":
+          if (bottom.y < 15 && grids[bottom.x + (bottom.y + 1) * 8].type == 'blank' && grids[top.x + (top.y + 1) * 8].type == 'blank') {
+            grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
+            grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
+            this.clearGrid(top.x, top.y);
+            this.clearGrid(bottom.x, bottom.y);
+            bottom.y++;
+            top.y++;
+          } else {
+            // 尝试消除
+            let arrCapsule = [top, bottom];
+            this.clearCapsule(arrCapsule);
+          }
+          break;
+        case "right":
+          if (bottom.y < 15 && grids[bottom.x + (bottom.y + 1) * 8].type == 'blank' && grids[top.x + (top.y + 1) * 8].type == 'blank') {
+            grids[bottom.x + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y + 1, rotate: bottom.rotate };
+            grids[top.x + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y + 1, rotate: top.rotate };
+            this.clearGrid(top.x, top.y);
+            this.clearGrid(bottom.x, bottom.y);
+            bottom.y++;
+            top.y++;
+          } else {
+            // 尝试消除
+            let arrCapsule = [top, bottom];
+            this.clearCapsule(arrCapsule);
+          }
+          break;
       }
     }
 
@@ -262,8 +307,6 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x - 1 + (top.y * 8)];
-          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
         }
         break;
       case "bottom":
@@ -272,8 +315,6 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x - 1 + (top.y * 8)];
-          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
         }
         break;
       case "left":
@@ -281,8 +322,6 @@ class App extends Component {
           grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x - 1 + (top.y * 8)];
-          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
         }
         break;
       case "right":
@@ -290,11 +329,11 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
           this.clearGrid(top.x, top.y);
-          top = grids[top.x - 1 + (top.y * 8)];
-          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
         }
         break;
     }
+    top.x--;
+    bottom.x--;
     this.setState({
       grids: grids
     })
@@ -309,8 +348,6 @@ class App extends Component {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x + 1 + (top.y * 8)];
-          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
         }
         break;
       case "bottom":
@@ -319,26 +356,67 @@ class App extends Component {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x + 1 + (top.y * 8)];
-          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
         }
         break;
       case "left":
         if (bottom.x < 7 && grids[bottom.x + 1 + (bottom.y * 8)].type == "blank") {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
-          this.clearGrid(bottom.x, bottom.y);
-          top = grids[top.x + 1 + (top.y * 8)];
-          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+          this.clearGrid(top.x, top.y);
         }
         break;
       case "right":
         if (top.x < 7 && grids[top.x + 1 + (top.y * 8)].type == "blank") {
           grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
+          this.clearGrid(bottom.x, bottom.y);
+        }
+        break;
+    }
+    top.x++;
+    bottom.x++;
+    this.setState({
+      grids: grids
+    })
+  }
+
+  // 旋转
+  rotate = () => {
+    switch (top.rotate) {
+      case "top":
+        if (top.x < 7 && grids[top.x + 1 + (top.y + 1) * 8].type == "blank") {
+          grids[top.x + 1 + (top.y + 1) * 8] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y + 1, rotate: "right" };
+          grids[bottom.x + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y, rotate: "left" };
           this.clearGrid(top.x, top.y);
-          top = grids[top.x + 1 + (top.y * 8)];
-          bottom = grids[bottom.x + 1 + (bottom.y * 8)];
+          top = grids[top.x + 1 + (top.y + 1) * 8];
+          bottom = grids[bottom.x + (bottom.y * 8)];
+        }
+        break;
+      case "bottom":
+        if (bottom.x < 7 && grids[bottom.x + 1 + (bottom.y + 1) * 8].type == "blank") {
+          grids[bottom.x + 1 + (bottom.y + 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y + 1, rotate: "right" };
+          grids[top.x + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x, y: top.y, rotate: "left" };
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x + (top.y * 8)];
+          bottom = grids[bottom.x + 1 + (bottom.y + 1) * 8];
+        }
+        break;
+      case "left":
+        if (grids[top.x + (top.y - 1) * 8].type == "blank") {
+          grids[top.x + (top.y - 1) * 8] = { type: 'capsule', color: top.color, x: top.x, y: top.y - 1, rotate: "top" };
+          grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: "bottom" };
+          this.clearGrid(bottom.x, bottom.y);
+          top = grids[top.x + (top.y - 1) * 8];
+          bottom = grids[bottom.x - 1 + (bottom.y * 8)];
+        }
+        break;
+      case "right":
+        if (grids[bottom.x + (bottom.y - 1) * 8].type == "blank") {
+          grids[bottom.x + (bottom.y - 1) * 8] = { type: 'capsule', color: bottom.color, x: bottom.x, y: bottom.y - 1, rotate: "top" };
+          grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: "bottom" };
+          this.clearGrid(top.x, top.y);
+          top = grids[top.x - 1 + (top.y * 8)];
+          bottom = grids[bottom.x + (bottom.y - 1) * 8];
         }
         break;
     }
@@ -352,19 +430,25 @@ class App extends Component {
     document.addEventListener('keyup', function (e) {
       switch (e.keyCode) {
         case 38:
-          //上
-          console.log(38);
+          // 旋转
+          app.rotate();
           break
         case 37:
           //左
           app.left();
           break
         case 39:
+          // 右
           app.right();
+          break
+        case 40:
+          // 右
+          app.fall();
           break
       }
     })
   }
+
   render() {
     const { grids } = this.state;
     return (
