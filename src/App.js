@@ -307,6 +307,8 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
+          top.x--;
+          bottom.x--;
         }
         break;
       case "bottom":
@@ -315,6 +317,8 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
+          top.x--;
+          bottom.x--;
         }
         break;
       case "left":
@@ -322,6 +326,8 @@ class App extends Component {
           grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(bottom.x, bottom.y);
+          top.x--;
+          bottom.x--;
         }
         break;
       case "right":
@@ -329,11 +335,12 @@ class App extends Component {
           grids[bottom.x - 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x - 1, y: bottom.y, rotate: bottom.rotate };
           grids[top.x - 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x - 1, y: top.y, rotate: top.rotate };
           this.clearGrid(top.x, top.y);
+          top.x--;
+          bottom.x--;
         }
         break;
     }
-    top.x--;
-    bottom.x--;
+
     this.setState({
       grids: grids
     })
@@ -348,6 +355,8 @@ class App extends Component {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
+          top.x++;
+          bottom.x++;
         }
         break;
       case "bottom":
@@ -356,6 +365,8 @@ class App extends Component {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(top.x, top.y);
           this.clearGrid(bottom.x, bottom.y);
+          top.x++;
+          bottom.x++;
         }
         break;
       case "left":
@@ -363,6 +374,8 @@ class App extends Component {
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
           this.clearGrid(top.x, top.y);
+          top.x++;
+          bottom.x++;
         }
         break;
       case "right":
@@ -370,11 +383,13 @@ class App extends Component {
           grids[top.x + 1 + (top.y * 8)] = { type: 'capsule', color: top.color, x: top.x + 1, y: top.y, rotate: top.rotate };
           grids[bottom.x + 1 + (bottom.y * 8)] = { type: 'capsule', color: bottom.color, x: bottom.x + 1, y: bottom.y, rotate: bottom.rotate };
           this.clearGrid(bottom.x, bottom.y);
+          top.x++;
+          bottom.x++; top.x++;
+          bottom.x++;
         }
         break;
     }
-    top.x++;
-    bottom.x++;
+
     this.setState({
       grids: grids
     })
